@@ -1,0 +1,422 @@
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WITHANYONE: TOWARDS CONTROLLABLE AND ID CONSISTENT IMAGE GENERATION</title>
+
+<!-- Fonts & UI libs (CDN so it works out-of-the-box) -->
+<link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/css/bulma-carousel.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/css/bulma-slider.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Chewy:regular" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css?family=Kaushan+Script:regular" rel="stylesheet" />
+
+<!-- Minimal inline styles to make it look good without local CSS -->
+<style>
+  :root{--bg:#070707;--text:#f4f3f1;--muted:#bfc3c7}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans","Google Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .column.has-text-centered{width:100%;text-align:center;background:#0a0a0a}
+  #title-icon{width:60px;height:60px;vertical-align:-8px;margin-right:8px;border-radius:8px}
+  .publication-title{line-height:1.05}
+  .publication-links .button{margin:4px 6px}
+  .drag-instruction{text-align:center;color:var(--muted);font-size:14px;margin:8px 0 20px}
+  .teaser_text{max-width:1200px;margin:0 auto;padding:12px 16px;color:#dfe3e6}
+  .content_one,.content_two{max-width:1200px;margin:0 auto;padding:16px}
+  .summary-img{border-radius:12px;border:1px solid rgba(255,255,255,.08)}
+  .result-instruction{text-align:center;margin:6px 0 16px;color:var(--muted)}
+
+  /* Top teaser carousel (JS-driven) */
+  .carousel-teaser-container{overflow:hidden;width:100%;padding:10px 0}
+  .carousel-teaser{display:flex;gap:10px;will-change:transform}
+  .teaser-img{height:260px;width:auto;border-radius:12px;border:1px solid rgba(255,255,255,.08)}
+
+  /* Repeating auto-scroll carousels (CSS-driven) */
+  .carousel-container{position:relative;overflow:hidden;width:100%;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);padding:12px 0;margin:12px 0 22px}
+  .carousel-content-float,.carousel-style-float{position:absolute;left:10px;top:10px;z-index:2}
+  .carousel-content-float img,.carousel-style-float img{width:140px;height:auto;border-radius:8px;border:1px solid rgba(255,255,255,.15);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+  .carousel{display:flex;gap:10px;align-items:center;will-change:transform}
+  .carousel img{height:220px;width:auto;border-radius:12px;border:1px solid rgba(255,255,255,.08)}
+  @keyframes scroll-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes scroll-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+  .carousel-scroll-left{animation:scroll-left 40s linear infinite}
+  .carousel-scroll-right{animation:scroll-right 40s linear infinite}
+
+  @media (max-width:600px){
+    .teaser-img{height:200px}
+    .carousel img{height:160px}
+    .carousel-content-float img,.carousel-style-float img{width:100px}
+  }
+</style>
+</head>
+
+<body>
+<div class="column has-text-centered">
+  <br><br>
+  <h1 class="title is-1 publication-title">
+    <span style="font-size:66px;color:#0dcedf;font-weight:bold;font-family: Marker Felt, regular;background:linear-gradient(to right,#54d2d2,#ff6150);-webkit-background-clip:text;color:transparent"><strong>WITHANYONE</strong></span><br>
+    <span style="font-size:40px;color:#f4f3f1;font-weight:bold;font-family: Comic Sans MS, cursive;letter-spacing:1.5px;"><strong>TOWARDS </strong></span>
+    <span style="font-size:40px;color:#54d2d2;font-weight:bold;font-family: Comic Sans MS, cursive;letter-spacing:1.5px;"><strong>CONTROLLABLE </strong></span>
+    <span style="font-size:40px;color:#f4f3f1;font-weight:bold;font-family: Comic Sans MS, cursive;letter-spacing:1.5px;"><strong>AND </strong></span>
+    <span style="font-size:40px;color:#ff6150;font-weight:bold;font-family: Comic Sans MS, cursive;letter-spacing:1.5px;"><strong>ID CONSISTENT </strong></span>
+    <span style="font-size:40px;color:#f4f3f1;font-weight:bold;font-family: Comic Sans MS, cursive;letter-spacing:1.5px;"><strong>IMAGE <br></strong></span>
+    <span style="font-size:40px;color:#f4f3f1;font-weight:bold;font-family: Comic Sans MS, cursive;letter-spacing:1.5px;"><strong>GENERATION</strong></span>
+  </h1>
+  <p id="authors">
+    <br>
+    <span style="color:#8b8d90;font-family:Gill Sans">Anonymous authors</span>
+    <br>
+  </p>
+
+  <div class="publication-authors" style="font-size: 22px; margin-bottom: 10px;">
+    <span class="author-block">
+      <b>ICLR 2025 (<font color="#F44336">Highlight</font>)</b></span>
+  </div>
+</div>
+
+<!--=================Teasers==========================-->
+<section class="hero is-small">
+  <div class="hero-body" style="background:#070707;width:100%;padding:0;">
+    <div class="carousel-teaser-container" id="container">
+      <div class="carousel-teaser" id="carousel">
+        <!-- loop1 -->
+        <img src="static/concat/001.webp" alt="Image 1" class="teaser-img">
+        <img src="static/concat/002.webp" alt="Image 2" class="teaser-img">
+        <img src="static/concat/003.webp" alt="Image 3" class="teaser-img">
+        <img src="static/concat/004.webp" alt="Image 4" class="teaser-img">
+        <img src="static/concat/005.webp" alt="Image 5" class="teaser-img">
+        <img src="static/concat/006.webp" alt="Image 6" class="teaser-img">
+        <img src="static/concat/007.webp" alt="Image 7" class="teaser-img">
+        <img src="static/concat/008.webp" alt="Image 8" class="teaser-img">
+        <img src="static/concat/009.webp" alt="Image 9" class="teaser-img">
+        <img src="static/concat/010.webp" alt="Image 10" class="teaser-img">
+        <!-- loop2 -->
+        <img src="static/concat/001.webp" alt="Image 1" class="teaser-img">
+        <img src="static/concat/002.webp" alt="Image 2" class="teaser-img">
+        <img src="static/concat/003.webp" alt="Image 3" class="teaser-img">
+        <img src="static/concat/004.webp" alt="Image 4" class="teaser-img">
+        <img src="static/concat/005.webp" alt="Image 5" class="teaser-img">
+        <img src="static/concat/006.webp" alt="Image 6" class="teaser-img">
+        <img src="static/concat/007.webp" alt="Image 7" class="teaser-img">
+        <img src="static/concat/008.webp" alt="Image 8" class="teaser-img">
+        <img src="static/concat/009.webp" alt="Image 9" class="teaser-img">
+        <img src="static/concat/010.webp" alt="Image 10" class="teaser-img">
+      </div>
+    </div>
+  </div>
+    <div class="teaser_text" style="color:#f4f3f1;">
+      <p>✨ <b>WithAnyone</b> is capable of generating high-quality, controllable, and ID consistent images ✨ </p>
+      </div>
+</section>
+
+<div class="content_one">
+  <!-- slider r->l -->
+  <div class="carousel-container">
+    <div class="carousel-content-float"><img src="static/single/Scarlett_Ingrid_Johansson/ref.jpg" alt="Original"></div>
+    <div class="carousel carousel-scroll-left">
+      <img src="static/single/Scarlett_Ingrid_Johansson/1.jpg" alt="Image 1">
+      <img src="static/single/Scarlett_Ingrid_Johansson/2.jpg" alt="Image 2">
+      <img src="static/single/Scarlett_Ingrid_Johansson/3.jpg" alt="Image 3">
+      <img src="static/single/Scarlett_Ingrid_Johansson/4.jpg" alt="Image 4">
+      <img src="static/single/Scarlett_Ingrid_Johansson/5.jpg" alt="Image 5">
+      <img src="static/single/Scarlett_Ingrid_Johansson/6.jpg" alt="Image 6">
+      <img src="static/single/Scarlett_Ingrid_Johansson/7.jpg" alt="Image 7">
+      <img src="static/single/Scarlett_Ingrid_Johansson/8.jpg" alt="Image 8">
+      <img src="static/single/Scarlett_Ingrid_Johansson/9.jpg" alt="Image 9">
+      <img src="static/single/Scarlett_Ingrid_Johansson/10.jpg" alt="Image 10">
+      <!-- loop2 -->
+      <img src="static/single/Scarlett_Ingrid_Johansson/1.jpg" alt="Image 1">
+      <img src="static/single/Scarlett_Ingrid_Johansson/2.jpg" alt="Image 2">
+      <img src="static/single/Scarlett_Ingrid_Johansson/3.jpg" alt="Image 3">
+      <img src="static/single/Scarlett_Ingrid_Johansson/4.jpg" alt="Image 4">
+      <img src="static/single/Scarlett_Ingrid_Johansson/5.jpg" alt="Image 5">
+      <img src="static/single/Scarlett_Ingrid_Johansson/6.jpg" alt="Image 6">
+      <img src="static/single/Scarlett_Ingrid_Johansson/7.jpg" alt="Image 7">
+      <img src="static/single/Scarlett_Ingrid_Johansson/8.jpg" alt="Image 8">
+      <img src="static/single/Scarlett_Ingrid_Johansson/9.jpg" alt="Image 9">
+      <img src="static/single/Scarlett_Ingrid_Johansson/10.jpg" alt="Image 10">
+    </div>
+  </div>
+
+  <!-- slider l->r -->
+  <div class="carousel-container">
+    <div class="carousel-content-float"><img src="static/single/BenedictCumberbatch/ref.jpg" alt="Original"></div>
+    <div class="carousel carousel-scroll-right">
+      <img src="static/single/BenedictCumberbatch/1.jpg" alt="Image 1">
+      <img src="static/single/BenedictCumberbatch/2.jpg" alt="Image 2">
+      <img src="static/single/BenedictCumberbatch/3.jpg" alt="Image 3">
+      <img src="static/single/BenedictCumberbatch/4.jpg" alt="Image 4">
+      <img src="static/single/BenedictCumberbatch/5.jpg" alt="Image 5">
+      <img src="static/single/BenedictCumberbatch/6.jpg" alt="Image 6">
+      <img src="static/single/BenedictCumberbatch/7.jpg" alt="Image 7">
+      <!-- loop2 (repeat) -->
+      <img src="static/single/BenedictCumberbatch/1.jpg" alt="Image 1">
+      <img src="static/single/BenedictCumberbatch/2.jpg" alt="Image 2">
+      <img src="static/single/BenedictCumberbatch/3.jpg" alt="Image 3">
+      <img src="static/single/BenedictCumberbatch/4.jpg" alt="Image 4">
+      <img src="static/single/BenedictCumberbatch/5.jpg" alt="Image 5">
+      <img src="static/single/BenedictCumberbatch/6.jpg" alt="Image 6">
+      <img src="static/single/BenedictCumberbatch/7.jpg" alt="Image 7">
+    </div>
+  </div>
+
+  <!-- slider r->l -->
+  <div class="carousel-container">
+    <div class="carousel-content-float"><img src="static/single/AnneHathaway/ref.jpg" alt="Original"></div>
+    <div class="carousel carousel-scroll-left">
+      <img src="static/single/AnneHathaway/1.jpg" alt="Image 1">
+      <img src="static/single/AnneHathaway/2.jpg" alt="Image 2">
+      <img src="static/single/AnneHathaway/3.jpg" alt="Image 3">
+      <img src="static/single/AnneHathaway/4.jpg" alt="Image 4">
+      <img src="static/single/AnneHathaway/5.jpg" alt="Image 5">
+      <img src="static/single/AnneHathaway/6.jpg" alt="Image 6">
+      <img src="static/single/AnneHathaway/7.jpg" alt="Image 7">
+      <img src="static/single/AnneHathaway/8.jpg" alt="Image 8">
+      <img src="static/single/AnneHathaway/9.jpg" alt="Image 9">
+      <img src="static/single/AnneHathaway/10.jpg" alt="Image 10">
+      <img src="static/single/AnneHathaway/11.jpg" alt="Image 11">
+      <img src="static/single/AnneHathaway/12.jpg" alt="Image 12">
+      <img src="static/single/AnneHathaway/13.jpg" alt="Image 13">
+      <img src="static/single/AnneHathaway/14.jpg" alt="Image 14">
+      <!-- loop2 -->
+      <img src="static/single/AnneHathaway/1.jpg" alt="Image 1">
+      <img src="static/single/AnneHathaway/2.jpg" alt="Image 2">
+      <img src="static/single/AnneHathaway/3.jpg" alt="Image 3">
+      <img src="static/single/AnneHathaway/4.jpg" alt="Image 4">
+      <img src="static/single/AnneHathaway/5.jpg" alt="Image 5">
+      <img src="static/single/AnneHathaway/6.jpg" alt="Image 6">
+      <img src="static/single/AnneHathaway/7.jpg" alt="Image 7">
+      <img src="static/single/AnneHathaway/8.jpg" alt="Image 8">
+      <img src="static/single/AnneHathaway/9.jpg" alt="Image 9">
+      <img src="static/single/AnneHathaway/10.jpg" alt="Image 10">
+      <img src="static/single/AnneHathaway/11.jpg" alt="Image 11">
+      <img src="static/single/AnneHathaway/12.jpg" alt="Image 12">
+      <img src="static/single/AnneHathaway/13.jpg" alt="Image 13">
+      <img src="static/single/AnneHathaway/14.jpg" alt="Image 14">
+    </div>
+  </div>
+
+  <!-- slider l->r -->
+  <div class="carousel-container">
+    <div class="carousel-style-float"><img src="static/single/tom_hiddleston/ref.jpg" alt="Original"></div>
+    <div class="carousel carousel-scroll-right">
+      <img src="static/single/tom_hiddleston/0.jpg" alt="Image 0">
+      <img src="static/single/tom_hiddleston/1.jpg" alt="Image 1">
+      <img src="static/single/tom_hiddleston/2.jpg" alt="Image 2">
+      <img src="static/single/tom_hiddleston/3.jpg" alt="Image 3">
+      <img src="static/single/tom_hiddleston/4.jpg" alt="Image 4">
+      <img src="static/single/tom_hiddleston/5.jpg" alt="Image 5">
+      <img src="static/single/tom_hiddleston/6.jpg" alt="Image 6">
+      <img src="static/single/tom_hiddleston/7.jpg" alt="Image 7">
+      <img src="static/single/tom_hiddleston/8.jpg" alt="Image 8">
+      <img src="static/single/tom_hiddleston/9.jpg" alt="Image 9">
+      <!-- loop2 -->
+      <img src="static/single/tom_hiddleston/0.jpg" alt="Image 0">
+      <img src="static/single/tom_hiddleston/1.jpg" alt="Image 1">
+      <img src="static/single/tom_hiddleston/2.jpg" alt="Image 2">
+      <img src="static/single/tom_hiddleston/3.jpg" alt="Image 3">
+      <img src="static/single/tom_hiddleston/4.jpg" alt="Image 4">
+      <img src="static/single/tom_hiddleston/5.jpg" alt="Image 5">
+      <img src="static/single/tom_hiddleston/6.jpg" alt="Image 6">
+      <img src="static/single/tom_hiddleston/7.jpg" alt="Image 7">
+      <img src="static/single/tom_hiddleston/8.jpg" alt="Image 8">
+      <img src="static/single/tom_hiddleston/9.jpg" alt="Image 9">
+    </div>
+  </div>
+
+  <!-- slider r->l -->
+  <div class="carousel-container">
+    <div class="carousel-style-float"><img src="static/single/Taylor/ref.jpg" alt="Original"></div>
+    <div class="carousel carousel-scroll-left">
+      <img src="static/single/Taylor/1.jpg" alt="Image 1">
+      <img src="static/single/Taylor/2.jpg" alt="Image 2">
+      <img src="static/single/Taylor/3.jpg" alt="Image 3">
+      <img src="static/single/Taylor/4.jpg" alt="Image 4">
+      <img src="static/single/Taylor/5.jpg" alt="Image 5">
+      <img src="static/single/Taylor/6.jpg" alt="Image 6">
+      <img src="static/single/Taylor/7.jpg" alt="Image 7">
+      <img src="static/single/Taylor/8.jpg" alt="Image 8">
+      <img src="static/single/Taylor/9.jpg" alt="Image 9">
+      <img src="static/single/Taylor/10.jpg" alt="Image 10">
+      <img src="static/single/Taylor/11.jpg" alt="Image 11">
+      <img src="static/single/Taylor/12.jpg" alt="Image 12">
+      <img src="static/single/Taylor/13.jpg" alt="Image 13">
+      <!-- loop2 -->
+      <img src="static/single/Taylor/1.jpg" alt="Image 1">
+      <img src="static/single/Taylor/2.jpg" alt="Image 2">
+      <img src="static/single/Taylor/3.jpg" alt="Image 3">
+      <img src="static/single/Taylor/4.jpg" alt="Image 4">
+      <img src="static/single/Taylor/5.jpg" alt="Image 5">
+      <img src="static/single/Taylor/6.jpg" alt="Image 6">
+      <img src="static/single/Taylor/7.jpg" alt="Image 7">
+      <img src="static/single/Taylor/8.jpg" alt="Image 8">
+      <img src="static/single/Taylor/9.jpg" alt="Image 9">
+      <img src="static/single/Taylor/10.jpg" alt="Image 10">
+      <img src="static/single/Taylor/11.jpg" alt="Image 11">
+      <img src="static/single/Taylor/12.jpg" alt="Image 12">
+      <img src="static/single/Taylor/13.jpg" alt="Image 13">
+    </div>
+  </div>
+
+  <!-- slider l->r -->
+  <div class="carousel-container">
+    <div class="carousel-style-float"><img src="static/single/MorganFreeman/ref.jpg" alt="Original"></div>
+    <div class="carousel carousel-scroll-right">
+      <img src="static/single/MorganFreeman/0.jpg" alt="Image 0">
+      <img src="static/single/MorganFreeman/1.jpg" alt="Image 1">
+      <img src="static/single/MorganFreeman/2.jpg" alt="Image 2">
+      <img src="static/single/MorganFreeman/3.jpg" alt="Image 3">
+      <img src="static/single/MorganFreeman/4.jpg" alt="Image 4">
+      <img src="static/single/MorganFreeman/5.jpg" alt="Image 5">
+      <img src="static/single/MorganFreeman/6.jpg" alt="Image 6">
+      <img src="static/single/MorganFreeman/7.jpg" alt="Image 7">
+      <img src="static/single/MorganFreeman/8.jpg" alt="Image 8">
+      <img src="static/single/MorganFreeman/9.jpg" alt="Image 9">
+      <img src="static/single/MorganFreeman/10.jpg" alt="Image 10">
+      <img src="static/single/MorganFreeman/11.jpg" alt="Image 11">
+      <img src="static/single/MorganFreeman/12.jpg" alt="Image 12">
+      <img src="static/single/MorganFreeman/13.jpg" alt="Image 13">
+      <img src="static/single/MorganFreeman/14.jpg" alt="Image 14">
+      <img src="static/single/MorganFreeman/15.jpg" alt="Image 15">
+      <!-- loop2 -->
+      <img src="static/single/MorganFreeman/0.jpg" alt="Image 0">
+      <img src="static/single/MorganFreeman/1.jpg" alt="Image 1">
+      <img src="static/single/MorganFreeman/2.jpg" alt="Image 2">
+      <img src="static/single/MorganFreeman/3.jpg" alt="Image 3">
+      <img src="static/single/MorganFreeman/4.jpg" alt="Image 4">
+      <img src="static/single/MorganFreeman/5.jpg" alt="Image 5">
+      <img src="static/single/MorganFreeman/6.jpg" alt="Image 6">
+      <img src="static/single/MorganFreeman/7.jpg" alt="Image 7">
+      <img src="static/single/MorganFreeman/8.jpg" alt="Image 8">
+      <img src="static/single/MorganFreeman/9.jpg" alt="Image 9">
+      <img src="static/single/MorganFreeman/10.jpg" alt="Image 10">
+      <img src="static/single/MorganFreeman/11.jpg" alt="Image 11">
+      <img src="static/single/MorganFreeman/12.jpg" alt="Image 12">
+      <img src="static/single/MorganFreeman/13.jpg" alt="Image 13">
+      <img src="static/single/MorganFreeman/14.jpg" alt="Image 14">
+      <img src="static/single/MorganFreeman/15.jpg" alt="Image 15">
+    </div>
+  </div>
+
+  <!-- slider r->l -->
+  <div class="carousel-container">
+    <div class="carousel-style-float"><img src="static/single/YangMi/ref.jpg" alt="Original"></div>
+    <div class="carousel carousel-scroll-left">
+      <img src="static/single/YangMi/1.jpg" alt="Image 1">
+      <img src="static/single/YangMi/3.jpg" alt="Image 3">
+      <img src="static/single/YangMi/4.jpg" alt="Image 4">
+      <img src="static/single/YangMi/5.jpg" alt="Image 5">
+      <img src="static/single/YangMi/6.jpg" alt="Image 6">
+      <img src="static/single/YangMi/7.jpg" alt="Image 7">
+      <img src="static/single/YangMi/8.jpg" alt="Image 8">
+      <img src="static/single/YangMi/9.jpg" alt="Image 9">
+      <img src="static/single/YangMi/10.jpg" alt="Image 10">
+      <!-- loop2 -->
+      <img src="static/single/YangMi/1.jpg" alt="Image 1">
+      <img src="static/single/YangMi/3.jpg" alt="Image 3">
+      <img src="static/single/YangMi/4.jpg" alt="Image 4">
+      <img src="static/single/YangMi/5.jpg" alt="Image 5">
+      <img src="static/single/YangMi/6.jpg" alt="Image 6">
+      <img src="static/single/YangMi/7.jpg" alt="Image 7">
+      <img src="static/single/YangMi/8.jpg" alt="Image 8">
+      <img src="static/single/YangMi/9.jpg" alt="Image 9">
+      <img src="static/single/YangMi/10.jpg" alt="Image 10">
+    </div>
+  </div>
+
+  <!-- slider l->r -->
+  <div class="carousel-container">
+    <div class="carousel-style-float"><img src="static/single/ShenTeng/ref.jpg" alt="Original"></div>
+    <div class="carousel carousel-scroll-right">
+      <img src="static/single/ShenTeng/1.jpg" alt="Image 1">
+      <img src="static/single/ShenTeng/2.jpg" alt="Image 2">
+      <img src="static/single/ShenTeng/3.jpg" alt="Image 3">
+      <img src="static/single/ShenTeng/4.jpg" alt="Image 4">
+      <img src="static/single/ShenTeng/5.jpg" alt="Image 5">
+      <img src="static/single/ShenTeng/6.jpg" alt="Image 6">
+      <img src="static/single/ShenTeng/7.jpg" alt="Image 7">
+      <img src="static/single/ShenTeng/8.jpg" alt="Image 8">
+      <img src="static/single/ShenTeng/9.jpg" alt="Image 9">
+      <img src="static/single/ShenTeng/10.jpg" alt="Image 10">
+      <!-- loop2 -->
+      <img src="static/single/ShenTeng/1.jpg" alt="Image 1">
+      <img src="static/single/ShenTeng/2.jpg" alt="Image 2">
+      <img src="static/single/ShenTeng/3.jpg" alt="Image 3">
+      <img src="static/single/ShenTeng/4.jpg" alt="Image 4">
+      <img src="static/single/ShenTeng/5.jpg" alt="Image 5">
+      <img src="static/single/ShenTeng/6.jpg" alt="Image 6">
+      <img src="static/single/ShenTeng/7.jpg" alt="Image 7">
+      <img src="static/single/ShenTeng/8.jpg" alt="Image 8">
+      <img src="static/single/ShenTeng/9.jpg" alt="Image 9">
+      <img src="static/single/ShenTeng/10.jpg" alt="Image 10">
+    </div>
+  </div>
+
+  <!-- slider r->l -->
+  <div class="carousel-container">
+    <div class="carousel-content-float"><img src="static/single/Rihanna/ref.jpg" alt="Original"></div>
+    <div class="carousel carousel-scroll-left">
+      <img src="static/single/Rihanna/1.jpg" alt="Image 1">
+      <img src="static/single/Rihanna/2.jpg" alt="Image 2">
+      <img src="static/single/Rihanna/3.jpg" alt="Image 3">
+      <img src="static/single/Rihanna/4.jpg" alt="Image 4">
+      <img src="static/single/Rihanna/5.jpg" alt="Image 5">
+      <img src="static/single/Rihanna/6.jpg" alt="Image 6">
+      <img src="static/single/Rihanna/7.jpg" alt="Image 7">
+      <img src="static/single/Rihanna/8.jpg" alt="Image 8">
+      <img src="static/single/Rihanna/9.jpg" alt="Image 9">
+      <!-- loop2 -->
+      <img src="static/single/Rihanna/1.jpg" alt="Image 1">
+      <img src="static/single/Rihanna/2.jpg" alt="Image 2">
+      <img src="static/single/Rihanna/3.jpg" alt="Image 3">
+      <img src="static/single/Rihanna/4.jpg" alt="Image 4">
+      <img src="static/single/Rihanna/5.jpg" alt="Image 5">
+      <img src="static/single/Rihanna/6.jpg" alt="Image 6">
+      <img src="static/single/Rihanna/7.jpg" alt="Image 7">
+      <img src="static/single/Rihanna/8.jpg" alt="Image 8">
+      <img src="static/single/Rihanna/9.jpg" alt="Image 9">
+    </div>
+  </div>
+</div>
+
+
+<!-- ======== JS: teaser drag-to-scroll logic ======== -->
+<script>
+window.addEventListener('load', function() {
+  const container = document.getElementById('container');
+  const carousel = document.getElementById('carousel');
+  const images = document.querySelectorAll('.teaser-img');
+  let isDragging = false, startX = 0, currentX = 0, scrollSpeed = 1, loopWidth = 0, isMouseOver = false;
+  function init() {
+    if (images.length === 0) return;
+    const firstImg = images[0];
+    const imgWidth = firstImg.offsetWidth || 600;
+    const uniqueCount = images.length >= 2 ? Math.floor(images.length / 2) : images.length;
+    loopWidth = (imgWidth + 10) * uniqueCount;
+    requestAnimationFrame(autoScroll);
+  }
+  function setPosition(x) { currentX = x; carousel.style.transform = `translateX(${currentX}px)`; }
+  function autoScroll() {
+    if (!isMouseOver && !isDragging && loopWidth > 0) {
+      currentX -= scrollSpeed;
+      if (currentX <= -loopWidth) currentX += loopWidth;
+      setPosition(currentX);
+    }
+    requestAnimationFrame(autoScroll);
+  }
+  carousel.addEventListener('mousedown', (e) => { e.preventDefault(); isDragging = true; startX = e.clientX - currentX; carousel.classList.add('dragging'); images.forEach(img => img.style.pointerEvents = 'none'); });
+  document.addEventListener('mousemove', (e) => { if (!isDragging) return; const newX = e.clientX - startX; setPosition(newX); });
+  document.addEventListener('mouseup', () => { if (!isDragging) return; isDragging = false; carousel.classList.remove('dragging'); images.forEach(img => img.style.pointerEvents = 'auto'); if (currentX > 0) { carousel.style.transition = 'transform .3s ease-out'; setPosition(currentX - loopWidth); setTimeout(() => { carousel.style.transition = ''; }, 300); } else if (currentX < -loopWidth * 2) { carousel.style.transition = 'transform .3s ease-out'; setPosition(currentX + loopWidth); setTimeout(() => { carousel.style.transition = ''; }, 300); } });
+  container.addEventListener('mouseenter', () => { isMouseOver = true; });
+  container.addEventListener('mouseleave', () => { isMouseOver = false; isDragging = false; carousel.classList.remove('dragging'); carousel.style.transition = ''; images.forEach(img => img.style.pointerEvents = 'auto'); });
+  carousel.addEventListener('touchstart', (e) => { isDragging = true; startX = e.touches[0].clientX - currentX; carousel.classList.add('dragging'); }, { passive: false });
+  document.addEventListener('touchmove', (e) => { if (!isDragging) return; e.preventDefault(); const newX = e.touches[0].clientX - startX; setPosition(newX); }, { passive: false });
+  document.addEventListener('touchend', () => { if (!isDragging) return; isDragging = false; carousel.classList.remove('dragging'); if (currentX > 0) { carousel.style.transition = 'transform .3s ease-out'; setPosition(currentX - loopWidth); setTimeout(() => carousel.style.transition = '', 300); } else if (currentX < -loopWidth * 2) { carousel.style.transition = 'transform .3s ease-out'; setPosition(currentX + loopWidth); setTimeout(() => carousel.style.transition = '', 300); } });
+  init();
+});
+</script>
+</body>
+</html>
